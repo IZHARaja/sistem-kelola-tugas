@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Mahasiswa{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="page-header">
+        <div>
+            <h1><i class="fas fa-graduation-cap"></i> Dashboard Mahasiswa</h1>
+            <p>Halo, <strong>{{ current_user.username }}</strong>!
+               Lihat dan kumpulkan tugas di bawah ini.</p>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-tasks"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ tugas_list | length }}</span>
+                <span class="stat-label">Total Tugas</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--success);">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-number">{{ submitted_ids | length }}</span>
+                <span class="stat-label">Sudah Dikumpulkan</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--warning);">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-number">{{ pending_count }}</span>
+                <span class="stat-label">Belum Dikumpulkan</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-section">
+        <h2><i class="fas fa-list-alt"></i> Daftar Penugasan</h2>
+
+        {% if tugas_list %}
+        <div class="tugas-grid">
+            {% for tugas in tugas_list %}
+            {% set is_submitted = tugas.id in submitted_ids %}
+            {% set is_expired = tugas.deadline < now %}
+            <div class="tugas-card">
+                <div class="tugas-header">
+                    <h3>{{ tugas.judul }}</h3>
+                    <span class="deadline-badge {% if is_expired %}deadline-passed{% endif %}">
+                        <i class="fas fa-clock"></i>
+                        {{ tugas.deadline.strftime('%d %b %Y, %H:%M') }}
+                    </span>
+                </div>
+                <p class="tugas-desc">
+                    {{ tugas.deskripsi[:150] }}{% if tugas.deskripsi | length > 150 %}...{% endif %}
+                </p>
+                <div class="tugas-meta">
+                    <span>
+                        {% if is_submitted %}
+                            <i class="fas fa-check-circle" style="color:var(--success);"></i>
+                            <span style="color:var(--success);">Sudah Dikumpulkan</span>
+                        {% elif is_expired %}
+                            <i class="fas fa-times-circle" style="color:var(--danger);"></i>
+                            <span style="color:var(--danger);">Deadline Lewat</span>
+                        {% else %}
+                            <i class="fas fa-circle-exclamation" style="color:var(--warning);"></i>
+                            <span style="color:var(--warning);">Belum Dikumpulkan</span>
+                        {% endif %}
+                    </span>
+                    <span>
+                        <i class="fas fa-user-tie"></i> {{ tugas.dosen.username }}
+                    </span>
+                </div>
+                <div class="tugas-actions">
+                    {% if is_submitted %}
+                    <span class="badge badge-success" style="padding: 0.5rem 1rem;">
+                        <i class="fas fa-check"></i> Terkumpul
+                    </span>
+                    {% elif not is_expired %}
+                    <a href="{{ url_for('mahasiswa.submit_tugas', tugas_id=tugas.id) }}"
+                       class="btn-primary btn-sm">
+                        <i class="fas fa-upload"></i> Kumpulkan
+                    </a>
+                    {% else %}
+                    <span class="badge badge-danger" style="padding: 0.5rem 1rem;">
+                        <i class="fas fa-lock"></i> Ditutup
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>Belum ada tugas yang diberikan oleh dosen.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

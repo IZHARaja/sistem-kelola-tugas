@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Registrasi{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card auth-card-wide">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h1>Buat Akun Baru</h1>
+            <p>Lengkapi data di bawah untuk mendaftar</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
+            {{ form.hidden_tag() }}
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Username</label>
+                    <div class="input-wrapper{% if form.username.errors %} error{% endif %}">
+                        {{ form.username(class="form-control", placeholder="Contoh: budi_santoso") }}
+                    </div>
+                    {% for error in form.username.errors %}
+                    <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <div class="input-wrapper{% if form.email.errors %} error{% endif %}">
+                        {{ form.email(class="form-control", placeholder="nama@email.com") }}
+                    </div>
+                    {% for error in form.email.errors %}
+                    <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <div class="input-wrapper{% if form.password.errors %} error{% endif %}">
+                        {{ form.password(id="password", class="form-control",
+                           placeholder="Min. 8 karakter") }}
+                        <button type="button" class="toggle-password"
+                                onclick="togglePassword('password')">
+                            <i class="fas fa-eye" id="eye-password"></i>
+                        </button>
+                    </div>
+                    {% for error in form.password.errors %}
+                    <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Konfirmasi Password</label>
+                    <div class="input-wrapper{% if form.confirm_password.errors %} error{% endif %}">
+                        {{ form.confirm_password(class="form-control",
+                           placeholder="Ulangi password") }}
+                    </div>
+                    {% for error in form.confirm_password.errors %}
+                    <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-id-badge"></i> {{ form.role.label.text }}</label>
+                <div class="input-wrapper select-wrapper">
+                    {{ form.role(class="form-control") }}
+                </div>
+            </div>
+
+            <div class="password-strength" id="passwordStrength">
+                <div class="strength-bar">
+                    <div class="strength-fill" id="strengthFill"></div>
+                </div>
+                <span id="strengthText" class="strength-label"></span>
+            </div>
+
+            <button type="submit" class="btn-primary btn-full">
+                <i class="fas fa-user-plus"></i> Buat Akun
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Sudah punya akun?
+                <a href="{{ url_for('auth.login') }}">Login di sini</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

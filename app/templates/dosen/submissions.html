@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Submissions — {{ tugas.judul }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <a href="{{ url_for('dosen.dashboard') }}" class="back-link">
+        <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+    </a>
+
+    <div class="page-header">
+        <div>
+            <h1><i class="fas fa-paper-plane"></i> Daftar Submission</h1>
+            <p>
+                Tugas: <strong>{{ tugas.judul }}</strong>
+                &mdash; Deadline: {{ tugas.deadline.strftime('%d %B %Y, %H:%M') }}
+            </p>
+        </div>
+        <div class="stat-card" style="padding: 1rem 1.5rem; min-width: 160px;">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ submissions | length }}</span>
+                <span class="stat-label">Mahasiswa Mengumpulkan</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-section">
+        {% if submissions %}
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Mahasiswa</th>
+                        <th>Email</th>
+                        <th>Waktu Pengumpulan</th>
+                        <th>Status</th>
+                        <th>Teks Jawaban</th>
+                        <th>File</th>
+                        <th>Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in submissions %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><strong>{{ sub.mahasiswa.username }}</strong></td>
+                        <td>{{ sub.mahasiswa.email }}</td>
+                        <td>{{ sub.submitted_at.strftime('%d %b %Y, %H:%M') }}</td>
+                        <td>
+                            {% if sub.submitted_at <= tugas.deadline %}
+                            <span class="badge badge-success">
+                                <i class="fas fa-check"></i> Tepat Waktu
+                            </span>
+                            {% else %}
+                            <span class="badge badge-danger">
+                                <i class="fas fa-times"></i> Terlambat
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if sub.konten %}
+                            <span style="color:var(--text-secondary);font-size:0.85rem;">
+                                {{ sub.konten[:100] }}{% if sub.konten|length > 100 %}...{% endif %}
+                            </span>
+                            {% else %}
+                            <span style="color:var(--text-muted);font-size:0.82rem;">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if sub.file_path %}
+                            <a href="{{ url_for('auth.download_file', filename=sub.file_path) }}"
+                               class="btn-secondary btn-sm" title="{{ sub.file_original }}">
+                                <i class="fas fa-download"></i>
+                                {{ sub.file_original[:20] }}{% if sub.file_original|length > 20 %}...{% endif %}
+                            </a>
+                            {% else %}
+                            <span style="color:var(--text-muted);font-size:0.82rem;">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if sub.link_url %}
+                            <a href="{{ sub.link_url }}" target="_blank" rel="noopener noreferrer"
+                               class="submission-link">
+                                <i class="fas fa-external-link-alt"></i> Buka Link
+                            </a>
+                            {% else %}
+                            <span style="color:var(--text-muted);font-size:0.82rem;">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>Belum ada mahasiswa yang mengumpulkan tugas ini.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

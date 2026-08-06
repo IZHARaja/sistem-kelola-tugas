@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SiKelTugas{% endblock %} — Sistem Pengelolaan Tugas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/neumorphism.css') }}">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <nav class="navbar">
+        <a href="{{ url_for('auth.dashboard') }}" class="nav-brand">
+            <i class="fas fa-tasks"></i> SiKelTugas
+        </a>
+        <div class="nav-links">
+            <span class="nav-user">
+                <i class="fas fa-user-circle"></i>
+                {{ current_user.username }}
+                <span class="badge-role badge-{{ current_user.role }}">
+                    {{ 'Dosen' if current_user.role == 'dosen' else 'Mahasiswa' }}
+                </span>
+            </span>
+            <a href="{{ url_for('auth.logout') }}" class="btn-nav">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {% if category == 'success' %}<i class="fas fa-check-circle"></i>
+                    {% elif category == 'danger' %}<i class="fas fa-exclamation-circle"></i>
+                    {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle"></i>
+                    {% else %}<i class="fas fa-info-circle"></i>{% endif %}
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

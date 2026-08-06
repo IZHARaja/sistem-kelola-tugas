@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <a href="{{ url_for('dosen.dashboard') }}" class="back-link">
+        <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+    </a>
+
+    <div class="form-card">
+        <div class="form-card-header">
+            <h1>
+                <i class="fas fa-{% if tugas %}edit{% else %}plus-circle{% endif %}"></i>
+                {{ title }}
+            </h1>
+            <p>
+                {% if tugas %}
+                    Perbarui detail penugasan yang sudah ada.
+                {% else %}
+                    Isi formulir berikut untuk membuat penugasan baru.
+                {% endif %}
+            </p>
+        </div>
+
+        <form method="POST"
+              action="{{ url_for('dosen.edit_tugas', tugas_id=tugas.id) if tugas
+                         else url_for('dosen.create_tugas') }}"
+              novalidate>
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                <label>{{ form.judul.label.text }}</label>
+                <div class="input-wrapper{% if form.judul.errors %} error{% endif %}">
+                    {{ form.judul(class="form-control",
+                       placeholder="Contoh: Tugas Besar 1 — Pemrograman Web") }}
+                </div>
+                {% for error in form.judul.errors %}
+                <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label>{{ form.deskripsi.label.text }}</label>
+                <div class="input-wrapper{% if form.deskripsi.errors %} error{% endif %}">
+                    {{ form.deskripsi(class="form-control", rows=7,
+                       placeholder="Tuliskan instruksi, kriteria penilaian, dan panduan pengerjaan...") }}
+                </div>
+                {% for error in form.deskripsi.errors %}
+                <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-calendar-alt"></i> {{ form.deadline.label.text }}
+                </label>
+                <div class="input-wrapper{% if form.deadline.errors %} error{% endif %}">
+                    {{ form.deadline(class="form-control") }}
+                </div>
+                {% for error in form.deadline.errors %}
+                <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions">
+                <a href="{{ url_for('dosen.dashboard') }}" class="btn-secondary">
+                    <i class="fas fa-times"></i> Batal
+                </a>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i> {{ form.submit.label.text }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

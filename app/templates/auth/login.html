@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h1>Selamat Datang</h1>
+            <p>Sistem Pengelolaan Tugas Mahasiswa</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.login') }}" novalidate autocomplete="on">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                <label for="username">
+                    <i class="fas fa-user"></i> Username
+                </label>
+                <div class="input-wrapper{% if form.username.errors %} error{% endif %}">
+                    {{ form.username(id="username", class="form-control",
+                       placeholder="Masukkan username", autocomplete="username") }}
+                </div>
+                {% for error in form.username.errors %}
+                <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="password">
+                    <i class="fas fa-key"></i> Password
+                </label>
+                <div class="input-wrapper{% if form.password.errors %} error{% endif %}">
+                    {{ form.password(id="password", class="form-control",
+                       placeholder="Masukkan password", autocomplete="current-password") }}
+                    <button type="button" class="toggle-password"
+                            onclick="togglePassword('password')"
+                            aria-label="Tampilkan/sembunyikan password">
+                        <i class="fas fa-eye" id="eye-password"></i>
+                    </button>
+                </div>
+                {% for error in form.password.errors %}
+                <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn-primary btn-full">
+                <i class="fas fa-sign-in-alt"></i> Masuk
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Belum punya akun?
+                <a href="{{ url_for('auth.register') }}">Daftar di sini</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
