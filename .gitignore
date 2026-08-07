@@ -19,6 +19,11 @@ instance/
 # Environment secrets
 .env
 
+# Test artifacts
+.coverage
+02_Test_Plans_and_Reports/coverage_html/
+02_Test_Plans_and_Reports/*.jtl
+
 # IDE
 .vscode/
 .idea/

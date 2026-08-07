@@ -51,4 +51,6 @@ def validate_password_strength(password: str) -> tuple:
         return False, 'Password harus mengandung setidaknya satu huruf kecil (a-z).'
     if not re.search(r'\d', password):
         return False, 'Password harus mengandung setidaknya satu angka (0-9).'
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>_\-\+=/\\\[\]]', password):
+        return False, 'Password harus mengandung setidaknya satu karakter simbol (!@#$%^&* dll).'
     return True, ''

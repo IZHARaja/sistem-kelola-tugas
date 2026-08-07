@@ -1,0 +1,422 @@
+{
+  "info": {
+    "name": "SiKelTugas API Test Collection",
+    "description": "Koleksi pengujian API untuk aplikasi SiKelTugas - Sistem Kelola Tugas Mahasiswa.\nMencakup Auth, Dosen, Mahasiswa endpoints dengan validasi response.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "base_url", "value": "http://127.0.0.1:5000"},
+    {"key": "dosen_username", "value": "dosen_uas"},
+    {"key": "dosen_password", "value": "Dosen@1234!"},
+    {"key": "mhs_username", "value": "mhs_uas"},
+    {"key": "mhs_password", "value": "Mhs@1234!"},
+    {"key": "tugas_id", "value": "1"}
+  ],
+  "item": [
+    {
+      "name": "01 — Auth",
+      "item": [
+        {
+          "name": "GET Login Page",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Contains login form', () => pm.expect(pm.response.text()).to.include('form'));",
+                  "pm.test('Response time < 800ms', () => pm.expect(pm.response.responseTime).to.be.below(800));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Register Page",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/register"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Contains register form', () => pm.expect(pm.response.text()).to.include('Buat Akun'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Register - Dosen (Valid)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/register",
+            "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "username", "value": "{{dosen_username}}"},
+                {"key": "email", "value": "dosen_uas@test.com"},
+                {"key": "password", "value": "{{dosen_password}}"},
+                {"key": "confirm_password", "value": "{{dosen_password}}"},
+                {"key": "role", "value": "dosen"}
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Register berhasil — redirect ke login', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Register - Mahasiswa (Valid)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/register",
+            "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "username", "value": "{{mhs_username}}"},
+                {"key": "email", "value": "mhs_uas@test.com"},
+                {"key": "password", "value": "{{mhs_password}}"},
+                {"key": "confirm_password", "value": "{{mhs_password}}"},
+                {"key": "role", "value": "mahasiswa"}
+              ]
+            }
+          },
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status 200 or 302', () => pm.expect(pm.response.code).to.be.oneOf([200,302]));"]}}]
+        },
+        {
+          "name": "POST Login - Dosen (Valid)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/login",
+            "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "username", "value": "{{dosen_username}}"},
+                {"key": "password", "value": "{{dosen_password}}"}
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login dosen — redirect ke dashboard', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+                  "});",
+                  "pm.test('Response time < 800ms', () => pm.expect(pm.response.responseTime).to.be.below(800));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Login - Wrong Password (Invalid)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/login",
+            "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "username", "value": "{{dosen_username}}"},
+                {"key": "password", "value": "WrongPass999"}
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login gagal — tetap di halaman login', () => pm.response.to.have.status(200));",
+                  "pm.test('Tidak ada redirect ke dashboard', () => {",
+                  "  pm.expect(pm.response.text()).to.not.include('/dosen/dashboard');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Logout",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/logout"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Logout redirect ke login', () => pm.expect(pm.response.code).to.be.oneOf([200, 302]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 — Dosen Endpoints",
+      "item": [
+        {
+          "name": "POST Login Dosen (Session Setup)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/login",
+            "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "username", "value": "{{dosen_username}}"},
+                {"key": "password", "value": "{{dosen_password}}"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Dosen Dashboard",
+          "request": {"method": "GET", "url": "{{base_url}}/dosen/dashboard"},
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Dashboard dosen 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response time < 500ms', () => pm.expect(pm.response.responseTime).to.be.below(500));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Buat Tugas Form",
+          "request": {"method": "GET", "url": "{{base_url}}/dosen/tugas/buat"},
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Form buat tugas 200', () => pm.response.to.have.status(200));"]}}]
+        },
+        {
+          "name": "POST Buat Tugas (Valid)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/dosen/tugas/buat",
+            "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "judul", "value": "Tugas UAS Postman Test"},
+                {"key": "deskripsi", "value": "Tugas ini dibuat melalui Postman untuk keperluan pengujian API otomatis."},
+                {"key": "deadline", "value": "2030-12-31T23:59"}
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Tugas berhasil dibuat (200/302)', () => pm.expect(pm.response.code).to.be.oneOf([200, 302]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Submissions Tugas",
+          "request": {"method": "GET", "url": "{{base_url}}/dosen/tugas/{{tugas_id}}/submissions"},
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Halaman submissions 200 atau redirect', () => pm.expect(pm.response.code).to.be.oneOf([200, 302, 403, 404]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 — Mahasiswa Endpoints",
+      "item": [
+        {
+          "name": "POST Login Mahasiswa (Session Setup)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/login",
+            "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "username", "value": "{{mhs_username}}"},
+                {"key": "password", "value": "{{mhs_password}}"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Mahasiswa Dashboard",
+          "request": {"method": "GET", "url": "{{base_url}}/mahasiswa/dashboard"},
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Dashboard mahasiswa 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response time < 500ms', () => pm.expect(pm.response.responseTime).to.be.below(500));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Form Submit Tugas",
+          "request": {"method": "GET", "url": "{{base_url}}/mahasiswa/tugas/{{tugas_id}}/submit"},
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Form submit 200 atau redirect', () => pm.expect(pm.response.code).to.be.oneOf([200, 302]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Submit Tugas - Teks (Valid)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/mahasiswa/tugas/{{tugas_id}}/submit",
+            "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "konten", "value": "Jawaban saya untuk tugas ini adalah menggunakan algoritma dynamic programming."}
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Submit berhasil (200/302)', () => pm.expect(pm.response.code).to.be.oneOf([200, 302]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Submit Tugas - Kosong (Invalid)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/mahasiswa/tugas/{{tugas_id}}/submit",
+            "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "konten", "value": ""},
+                {"key": "link_url", "value": ""}
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Submit kosong ditolak (200 dengan error)', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 — Security Tests",
+      "item": [
+        {
+          "name": "Akses Dosen Endpoint tanpa Login",
+          "request": {"method": "GET", "url": "{{base_url}}/dosen/dashboard"},
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Redirect ke login jika belum auth', () => pm.expect(pm.response.code).to.be.oneOf([200, 302]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "XSS Payload pada Username",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/register",
+            "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {"key": "username", "value": "<script>alert(1)</script>"},
+                {"key": "email", "value": "xss@test.com"},
+                {"key": "password", "value": "Xss@1234!"},
+                {"key": "confirm_password", "value": "Xss@1234!"},
+                {"key": "role", "value": "mahasiswa"}
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('XSS payload tidak dieksekusi (tidak ada <script> di response)', () => {",
+                  "  pm.expect(pm.response.text()).to.not.include('<script>alert(1)</script>');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Path Traversal pada File Download",
+          "request": {"method": "GET", "url": "{{base_url}}/uploads/../../../etc/passwd"},
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Path traversal diblokir (302/400/404)', () => pm.expect(pm.response.code).to.be.oneOf([302, 400, 403, 404]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

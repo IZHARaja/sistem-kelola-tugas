@@ -12,9 +12,11 @@ csrf = CSRFProtect()
 limiter = Limiter(key_func=get_remote_address, default_limits=["300 per day", "60 per hour"])
 
 
-def create_app(config_class=Config):
+def create_app(config_class=Config, test_config=None):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    if test_config:
+        app.config.update(test_config)
 
     db.init_app(app)
     login_manager.init_app(app)
