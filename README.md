@@ -171,6 +171,6 @@ start 02_Test_Plans_and_Reports/coverage_html/index.html
 | Nama | Role | NIM |
 |---|---|---|
 | ____IZHAR____________ | Backend + Testing | _105841109023_______________ |
-| ________________ | Frontend + UI/UX | ________________ |
-| ________________ | Documentation + QA | ________________ |
-| ________________ | DevOps + Security | ________________ |
+| ______DEVI NIRWANA __________ | Frontend + UI/UX | ____105841121023 ____________ |
+| _MUH.RIZKI AQIL AZ-ZIKRA ALIMUDDIN _______________ | Documentation + QA | _______105841109623 _________ |
+| ____M ERWIN KHUSNAEDY ____________ | DevOps + Security | ___105841120623 _____________ |
