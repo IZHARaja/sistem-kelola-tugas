@@ -169,8 +169,8 @@ start 02_Test_Plans_and_Reports/coverage_html/index.html
 ## Tim Pengembang
 
 | Nama | Role | NIM |
-|---IZHAR|---|--105841109023-|
-| ________________ | Backend + Testing | ________________ |
+|---|---|---|
+| ____IZHAR____________ | Backend + Testing | _105841109023_______________ |
 | ________________ | Frontend + UI/UX | ________________ |
 | ________________ | Documentation + QA | ________________ |
 | ________________ | DevOps + Security | ________________ |
