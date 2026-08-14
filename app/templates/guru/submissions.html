@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="dashboard-container">
-    <a href="{{ url_for('dosen.dashboard') }}" class="back-link">
+    <a href="{{ url_for('guru.dashboard') }}" class="back-link">
         <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
     </a>
 
@@ -19,7 +19,31 @@
             <div class="stat-icon"><i class="fas fa-users"></i></div>
             <div class="stat-info">
                 <span class="stat-number">{{ submissions | length }}</span>
-                <span class="stat-label">Mahasiswa Mengumpulkan</span>
+                <span class="stat-label">Siswa Mengumpulkan</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid" style="margin-bottom: 2rem;">
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--success);"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ submissions | selectattr('submitted_at', 'le', tugas.deadline) | list | length }}</span>
+                <span class="stat-label">Tepat Waktu</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--danger);"><i class="fas fa-hourglass-end"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ submissions | selectattr('submitted_at', 'gt', tugas.deadline) | list | length }}</span>
+                <span class="stat-label">Terlambat</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--secondary);"><i class="fas fa-file-alt"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ submissions | selectattr('konten') | list | length }}</span>
+                <span class="stat-label">Ada Jawaban Teks</span>
             </div>
         </div>
     </div>
@@ -31,20 +55,23 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Mahasiswa</th>
+                        <th>Siswa</th>
+                        <th>NIS</th>
                         <th>Email</th>
                         <th>Waktu Pengumpulan</th>
                         <th>Status</th>
                         <th>Teks Jawaban</th>
                         <th>File</th>
                         <th>Link</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for sub in submissions %}
                     <tr>
                         <td>{{ loop.index }}</td>
-                        <td><strong>{{ sub.mahasiswa.username }}</strong></td>
+                        <td><strong>{{ sub.mahasiswa.display_name }}</strong></td>
+                        <td>{{ sub.mahasiswa.nis or '—' }}</td>
                         <td>{{ sub.mahasiswa.email }}</td>
                         <td>{{ sub.submitted_at.strftime('%d %b %Y, %H:%M') }}</td>
                         <td>
@@ -88,6 +115,12 @@
                             <span style="color:var(--text-muted);font-size:0.82rem;">—</span>
                             {% endif %}
                         </td>
+                        <td>
+                            <a href="{{ url_for('guru.view_submission_detail', tugas_id=tugas.id, submission_id=sub.id) }}"
+                               class="btn-primary btn-sm">
+                                <i class="fas fa-eye"></i> Lihat Detail
+                            </a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -96,7 +129,7 @@
         {% else %}
         <div class="empty-state">
             <i class="fas fa-inbox"></i>
-            <p>Belum ada mahasiswa yang mengumpulkan tugas ini.</p>
+            <p>Belum ada siswa yang mengumpulkan tugas ini.</p>
         </div>
         {% endif %}
     </div>

@@ -18,9 +18,12 @@
         <div class="nav-links">
             <span class="nav-user">
                 <i class="fas fa-user-circle"></i>
-                {{ current_user.username }}
+                {{ current_user.display_name }}
+                {% if current_user.role_identity %}
+                <small>({{ current_user.role_identity }})</small>
+                {% endif %}
                 <span class="badge-role badge-{{ current_user.role }}">
-                    {{ 'Dosen' if current_user.role == 'dosen' else 'Mahasiswa' }}
+                    {{ 'Guru' if current_user.role == 'dosen' else 'Siswa' }}
                 </span>
             </span>
             <a href="{{ url_for('auth.logout') }}" class="btn-nav">

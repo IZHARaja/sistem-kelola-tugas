@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Pilih Portal{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="portal-shell">
+        <section class="portal-panel">
+            <span class="portal-kicker">
+                <i class="fas fa-school"></i> Portal Akses SiKelTugas
+            </span>
+            <h1>Pilih jalur masuk yang sesuai dengan peran Anda.</h1>
+            <p class="portal-lead">
+                Sistem ini memisahkan akses siswa dan guru agar identitas login, dashboard, dan alur tugas tetap jelas sejak awal.
+            </p>
+
+            <div class="portal-grid">
+                <a href="{{ login_routes['mahasiswa'] }}" class="portal-card student">
+                    <div class="portal-card-head">
+                        <span class="portal-card-icon"><i class="fas fa-user-graduate"></i></span>
+                        <span class="portal-link">Masuk Siswa <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                    <h2>Portal Siswa</h2>
+                    <p>Gunakan NIS, email, nama lengkap, dan password akun yang sudah terdaftar.</p>
+                    <div class="portal-card-meta">
+                        <span class="portal-chip">NIS</span>
+                        <span class="portal-chip">Email</span>
+                        <span class="portal-chip">Nama Lengkap</span>
+                    </div>
+                </a>
+
+                <a href="{{ login_routes['dosen'] }}" class="portal-card teacher">
+                    <div class="portal-card-head">
+                        <span class="portal-card-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+                        <span class="portal-link">Masuk Guru <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                    <h2>Portal Guru</h2>
+                    <p>Gunakan NIP, email, nama lengkap, dan password akun pengajar yang sudah terdaftar.</p>
+                    <div class="portal-card-meta">
+                        <span class="portal-chip">NIP</span>
+                        <span class="portal-chip">Email</span>
+                        <span class="portal-chip">Nama Lengkap</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <aside class="portal-aside">
+            <h3>Yang perlu disiapkan</h3>
+            <ul class="portal-list">
+                <li>
+                    <i class="fas fa-id-card"></i>
+                    Pastikan NIS atau NIP yang dipakai sama dengan data yang tersimpan di sistem.
+                </li>
+                <li>
+                    <i class="fas fa-envelope"></i>
+                    Gunakan email aktif yang dipakai saat pendaftaran akun.
+                </li>
+                <li>
+                    <i class="fas fa-file-excel"></i>
+                    Data register harus lebih dulu ada di file Excel resmi sekolah untuk siswa atau guru.
+                </li>
+                <li>
+                    <i class="fas fa-file-upload"></i>
+                    Siswa dapat mengumpulkan tugas dalam bentuk Office, PDF, gambar, ZIP, atau teks/link.
+                </li>
+            </ul>
+
+            <div class="portal-register-links">
+                <a href="{{ register_routes['mahasiswa'] }}">
+                    <span>Daftarkan akun siswa</span>
+                    <i class="fas fa-user-plus"></i>
+                </a>
+                <a href="{{ register_routes['dosen'] }}">
+                    <span>Daftarkan akun guru</span>
+                    <i class="fas fa-user-plus"></i>
+                </a>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}

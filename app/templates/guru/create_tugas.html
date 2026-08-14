@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="form-container">
-    <a href="{{ url_for('dosen.dashboard') }}" class="back-link">
+    <a href="{{ url_for('guru.dashboard') }}" class="back-link">
         <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
     </a>
 
@@ -23,8 +23,8 @@
         </div>
 
         <form method="POST"
-              action="{{ url_for('dosen.edit_tugas', tugas_id=tugas.id) if tugas
-                         else url_for('dosen.create_tugas') }}"
+              action="{{ url_for('guru.edit_tugas', tugas_id=tugas.id) if tugas
+                         else url_for('guru.create_tugas') }}"
               novalidate>
             {{ form.hidden_tag() }}
 
@@ -63,7 +63,7 @@
             </div>
 
             <div class="form-actions">
-                <a href="{{ url_for('dosen.dashboard') }}" class="btn-secondary">
+                <a href="{{ url_for('guru.dashboard') }}" class="btn-secondary">
                     <i class="fas fa-times"></i> Batal
                 </a>
                 <button type="submit" class="btn-primary">

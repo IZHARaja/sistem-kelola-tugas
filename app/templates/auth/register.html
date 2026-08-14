@@ -9,19 +9,64 @@
                 <i class="fas fa-user-plus"></i>
             </div>
             <h1>Buat Akun Baru</h1>
-            <p>Lengkapi data di bawah untuk mendaftar</p>
+            <p>Pilih jenis akun lebih dulu agar formulir identitas yang muncul sesuai peran</p>
         </div>
 
-        <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
+        <form method="POST" action="{{ form_action }}" novalidate>
             {{ form.hidden_tag() }}
+
+            <div class="role-switch" data-role-switch="register" aria-label="Pilih tipe akun">
+                <a href="{{ register_routes['mahasiswa'] }}" class="role-option{% if role_mode == 'mahasiswa' %} active{% endif %}" data-role-option="mahasiswa">
+                    <span class="role-option-icon"><i class="fas fa-user-graduate"></i></span>
+                    <span>
+                        <strong>Akun Siswa</strong>
+                        <small>Memakai NIS sebagai identitas utama</small>
+                    </span>
+                </a>
+                <a href="{{ register_routes['dosen'] }}" class="role-option{% if role_mode == 'dosen' %} active{% endif %}" data-role-option="dosen">
+                    <span class="role-option-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+                    <span>
+                        <strong>Akun Guru</strong>
+                        <small>Memakai NIP sebagai identitas utama</small>
+                    </span>
+                </a>
+            </div>
+
+            <div class="role-summary" id="registerRoleSummary">
+                <div class="role-summary-head">
+                    <span class="role-summary-icon" id="registerRoleIconWrap">
+                        <i class="fas fa-user-graduate" id="registerRoleIcon"></i>
+                    </span>
+                    <div>
+                        <h3 id="registerRoleTitle">Pendaftaran Siswa</h3>
+                        <p id="registerRoleHint">Siapkan nama lengkap, email aktif, NIS, dan password yang kuat.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="role-summary">
+                <div class="role-summary-head">
+                    <span class="role-summary-icon">
+                        <i class="fas fa-file-excel"></i>
+                    </span>
+                    <div>
+                        <h3>Verifikasi Data Resmi Sekolah</h3>
+                        <p>
+                            Akun hanya bisa dibuat jika identitas Anda sudah lebih dulu tercatat
+                            pada file Excel resmi sekolah untuk siswa atau guru.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label><i class="fas fa-user"></i> Username</label>
-                    <div class="input-wrapper{% if form.username.errors %} error{% endif %}">
-                        {{ form.username(class="form-control", placeholder="Contoh: budi_santoso") }}
+                    <label><i class="fas fa-address-card"></i> {{ form.full_name.label.text }}</label>
+                    <div class="input-wrapper{% if form.full_name.errors %} error{% endif %}">
+                        {{ form.full_name(class="form-control", placeholder="Contoh: Budi Santoso", autocomplete="name") }}
                     </div>
-                    {% for error in form.username.errors %}
+                    <span class="form-helper">Nama ini akan dipakai untuk verifikasi login dan tampilan dashboard.</span>
+                    {% for error in form.full_name.errors %}
                     <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
                     {% endfor %}
                 </div>
@@ -32,6 +77,42 @@
                         {{ form.email(class="form-control", placeholder="nama@email.com") }}
                     </div>
                     {% for error in form.email.errors %}
+                    <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group role-native-select">
+                <div class="form-group">
+                    <label><i class="fas fa-id-badge"></i> {{ form.role.label.text }}</label>
+                    <div class="input-wrapper select-wrapper{% if form.role.errors %} error{% endif %}">
+                        {{ form.role(id="role", class="form-control") }}
+                    </div>
+                    {% for error in form.role.errors %}
+                    <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group" id="nisGroup">
+                    <label><i class="fas fa-id-card"></i> {{ form.nis.label.text }}</label>
+                    <div class="input-wrapper{% if form.nis.errors %} error{% endif %}">
+                        {{ form.nis(class="form-control", placeholder="Masukkan NIS") }}
+                    </div>
+                    <span class="form-helper">Wajib untuk akun siswa.</span>
+                    {% for error in form.nis.errors %}
+                    <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group" id="nipGroup">
+                    <label><i class="fas fa-id-card"></i> {{ form.nip.label.text }}</label>
+                    <div class="input-wrapper{% if form.nip.errors %} error{% endif %}">
+                        {{ form.nip(class="form-control", placeholder="Masukkan NIP") }}
+                    </div>
+                    <span class="form-helper">Wajib untuk akun guru.</span>
+                    {% for error in form.nip.errors %}
                     <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
                     {% endfor %}
                 </div>
@@ -65,13 +146,6 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label><i class="fas fa-id-badge"></i> {{ form.role.label.text }}</label>
-                <div class="input-wrapper select-wrapper">
-                    {{ form.role(class="form-control") }}
-                </div>
-            </div>
-
             <div class="password-strength" id="passwordStrength">
                 <div class="strength-bar">
                     <div class="strength-fill" id="strengthFill"></div>
@@ -86,7 +160,7 @@
 
         <div class="auth-footer">
             <p>Sudah punya akun?
-                <a href="{{ url_for('auth.login') }}">Login di sini</a>
+                <a href="{{ login_routes[role_mode] }}">Login {{ role_label }} di sini</a>
             </p>
         </div>
     </div>

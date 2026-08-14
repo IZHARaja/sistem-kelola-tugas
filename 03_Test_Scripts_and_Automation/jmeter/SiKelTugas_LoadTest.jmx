@@ -3,7 +3,7 @@
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="SiKelTugas Load &amp; Performance Test">
       <stringProp name="TestPlan.comments">Load &amp; Performance Testing untuk SiKelTugas
-Skenario: Simulasi 50 concurrent users melakukan login dan akses dashboard</stringProp>
+    Skenario: Simulasi 50 concurrent users melakukan login guru dan akses dashboard utama</stringProp>
       <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
       <elementProp name="TestPlan.arguments" elementType="Arguments">
         <collectionProp name="Arguments.arguments">
@@ -51,8 +51,8 @@ Skenario: Simulasi 50 concurrent users melakukan login dan akses dashboard</stri
       </ThreadGroup>
       <hashTree>
         <!-- Step 1: GET Login Page -->
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /login">
-          <stringProp name="HTTPSampler.path">/login</stringProp>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /login/guru">
+          <stringProp name="HTTPSampler.path">/login/guru</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
         </HTTPSamplerProxy>
         <hashTree>
@@ -68,19 +68,31 @@ Skenario: Simulasi 50 concurrent users melakukan login dan akses dashboard</stri
         </hashTree>
 
         <!-- Step 2: POST Login -->
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST /login">
-          <stringProp name="HTTPSampler.path">/login</stringProp>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST /login/guru">
+          <stringProp name="HTTPSampler.path">/login/guru</stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
-              <elementProp name="username" elementType="HTTPArgument">
-                <stringProp name="Argument.name">username</stringProp>
-                <stringProp name="Argument.value">dosen_uas</stringProp>
+              <elementProp name="role" elementType="HTTPArgument">
+                <stringProp name="Argument.name">role</stringProp>
+                <stringProp name="Argument.value">dosen</stringProp>
+              </elementProp>
+              <elementProp name="identifier" elementType="HTTPArgument">
+                <stringProp name="Argument.name">identifier</stringProp>
+                <stringProp name="Argument.value">NIP-UAS-001</stringProp>
+              </elementProp>
+              <elementProp name="email" elementType="HTTPArgument">
+                <stringProp name="Argument.name">email</stringProp>
+                <stringProp name="Argument.value">guru_uas@test.com</stringProp>
+              </elementProp>
+              <elementProp name="full_name" elementType="HTTPArgument">
+                <stringProp name="Argument.name">full_name</stringProp>
+                <stringProp name="Argument.value">Guru UAS</stringProp>
               </elementProp>
               <elementProp name="password" elementType="HTTPArgument">
                 <stringProp name="Argument.name">password</stringProp>
-                <stringProp name="Argument.value">Dosen@1234!</stringProp>
+                <stringProp name="Argument.value">Guru@1234!</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
@@ -93,8 +105,8 @@ Skenario: Simulasi 50 concurrent users melakukan login dan akses dashboard</stri
         </hashTree>
 
         <!-- Step 3: GET Dashboard -->
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /mahasiswa/dashboard">
-          <stringProp name="HTTPSampler.path">/mahasiswa/dashboard</stringProp>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /guru/dashboard">
+          <stringProp name="HTTPSampler.path">/guru/dashboard</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
         </HTTPSamplerProxy>
         <hashTree>

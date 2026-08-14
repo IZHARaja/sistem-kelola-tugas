@@ -1,7 +1,7 @@
-from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db, login_manager
+from .time_utils import utc_now
 
 
 class User(UserMixin, db.Model):
@@ -9,10 +9,13 @@ class User(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    full_name = db.Column(db.String(120), nullable=False, default='')
+    nis = db.Column(db.String(32), nullable=True, index=True)
+    nip = db.Column(db.String(32), nullable=True, index=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
     role = db.Column(db.String(20), nullable=False, default='mahasiswa')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utc_now)
     is_active = db.Column(db.Boolean, default=True)
 
     tugas_dibuat = db.relationship('Tugas', backref='dosen', lazy='dynamic',
@@ -27,8 +30,18 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    @property
+    def display_name(self):
+        return self.full_name or self.username
+
+    @property
+    def role_identity(self):
+        if self.role == 'dosen':
+            return self.nip or self.username
+        return self.nis or self.username
+
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.display_name}>'
 
 
 class Tugas(db.Model):
@@ -39,8 +52,8 @@ class Tugas(db.Model):
     deskripsi = db.Column(db.Text, nullable=False)
     deadline = db.Column(db.DateTime, nullable=False)
     dosen_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utc_now)
+    updated_at = db.Column(db.DateTime, default=utc_now, onupdate=utc_now)
 
     submissions = db.relationship('Submission', backref='tugas', lazy='dynamic',
                                   cascade='all, delete-orphan')
@@ -59,7 +72,7 @@ class Submission(db.Model):
     file_path = db.Column(db.String(300), nullable=True)  # Nama file tersimpan (opsional)
     file_original = db.Column(db.String(300), nullable=True)  # Nama asli file
     link_url = db.Column(db.String(500), nullable=True)  # URL/link (opsional)
-    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    submitted_at = db.Column(db.DateTime, default=utc_now)
 
     __table_args__ = (
         # Unique constraint mencegah duplikasi submission (mitigasi logic flaw)
@@ -75,7 +88,7 @@ class SecurityLog(db.Model):
     __tablename__ = 'security_logs'
 
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    timestamp = db.Column(db.DateTime, default=utc_now, index=True)
     event_type = db.Column(db.String(50), nullable=False)  # LOGIN_SUCCESS, LOGIN_FAIL, LOGOUT, dll
     username = db.Column(db.String(64), nullable=True)
     ip_address = db.Column(db.String(45), nullable=True)

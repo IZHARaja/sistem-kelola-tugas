@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="form-container">
-    <a href="{{ url_for('mahasiswa.dashboard') }}" class="back-link">
+    <a href="{{ url_for('siswa.dashboard') }}" class="back-link">
         <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
     </a>
 
@@ -18,7 +18,7 @@
             <p>{{ tugas.deskripsi }}</p>
             <div class="tugas-meta" style="margin-top: 0.75rem;">
                 <span>
-                    <i class="fas fa-user-tie"></i> {{ tugas.dosen.username }}
+                    <i class="fas fa-user-tie"></i> {{ tugas.dosen.display_name }}
                 </span>
                 <span class="deadline-badge {% if tugas.deadline < now %}deadline-passed{% endif %}">
                     <i class="fas fa-clock"></i>
@@ -28,7 +28,7 @@
         </div>
 
         <form method="POST"
-              action="{{ url_for('mahasiswa.submit_tugas', tugas_id=tugas.id) }}"
+              action="{{ url_for('siswa.submit_tugas', tugas_id=tugas.id) }}"
               enctype="multipart/form-data"
               novalidate>
             {{ form.hidden_tag() }}
@@ -57,9 +57,9 @@
                 <div class="file-upload-wrapper{% if form.file.errors %} error{% endif %}">
                     <label class="file-upload-label" for="file">
                         <i class="fas fa-upload"></i>
-                        <span id="fileNameDisplay">Pilih file (PDF, DOC, DOCX, ZIP, gambar, dll — maks 16 MB)</span>
+                        <span id="fileNameDisplay">Pilih file Office, PDF, gambar, atau ZIP (maks 16 MB)</span>
                     </label>
-                    {{ form.file(id="file", class="file-input", onchange="showFileName(this)") }}
+                    {{ form.file(id="file", class="file-input", onchange="showFileName(this)", accept=".pdf,.doc,.docx,.txt,.zip,.png,.jpg,.jpeg,.gif,.webp,.bmp,.ppt,.pptx,.xlsx,.xls") }}
                 </div>
                 {% for error in form.file.errors %}
                 <span class="form-error"><i class="fas fa-times-circle"></i> {{ error }}</span>
@@ -87,7 +87,7 @@
             </p>
 
             <div class="form-actions">
-                <a href="{{ url_for('mahasiswa.dashboard') }}" class="btn-secondary">
+                <a href="{{ url_for('siswa.dashboard') }}" class="btn-secondary">
                     <i class="fas fa-times"></i> Batal
                 </a>
                 <button type="submit" class="btn-primary">

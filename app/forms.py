@@ -5,18 +5,29 @@ from wtforms.fields import DateTimeLocalField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional, URL
 from .models import User
 
-ALLOWED_UPLOAD = ['pdf', 'doc', 'docx', 'txt', 'zip', 'png', 'jpg', 'jpeg', 'ppt', 'pptx', 'xlsx', 'xls']
+ROLE_CHOICES = [('mahasiswa', 'Siswa'), ('dosen', 'Guru')]
+ALLOWED_UPLOAD = [
+    'pdf', 'doc', 'docx', 'txt', 'zip',
+    'png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp',
+    'ppt', 'pptx', 'xlsx', 'xls'
+]
+UPLOAD_ACCEPT = '.pdf,.doc,.docx,.txt,.zip,.png,.jpg,.jpeg,.gif,.webp,.bmp,.ppt,.pptx,.xlsx,.xls'
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=64)])
+    role = SelectField('Login sebagai', choices=ROLE_CHOICES, validators=[DataRequired()])
+    identifier = StringField('NIS / NIP', validators=[DataRequired(), Length(min=3, max=32)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    full_name = StringField('Nama Lengkap', validators=[DataRequired(), Length(min=3, max=120)])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Masuk')
 
 
 class RegisterForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=64)])
+    full_name = StringField('Nama Lengkap', validators=[DataRequired(), Length(min=3, max=120)])
     email = StringField('Email', validators=[DataRequired(), Email()])
+    nis = StringField('NIS', validators=[Optional(), Length(min=3, max=32)])
+    nip = StringField('NIP', validators=[Optional(), Length(min=3, max=32)])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=128)])
     confirm_password = PasswordField(
         'Konfirmasi Password',
@@ -24,18 +35,39 @@ class RegisterForm(FlaskForm):
     )
     role = SelectField(
         'Daftar sebagai',
-        choices=[('mahasiswa', 'Mahasiswa'), ('dosen', 'Dosen')],
+        choices=ROLE_CHOICES,
         validators=[DataRequired()]
     )
     submit = SubmitField('Buat Akun')
 
-    def validate_username(self, username):
-        if User.query.filter_by(username=username.data).first():
-            raise ValidationError('Username sudah digunakan.')
+    def validate(self, extra_validators=None):
+        rv = super().validate(extra_validators)
+        if not rv:
+            return False
+
+        if self.role.data == 'mahasiswa' and not (self.nis.data or '').strip():
+            self.nis.errors.append('NIS wajib diisi untuk akun siswa.')
+            return False
+
+        if self.role.data == 'dosen' and not (self.nip.data or '').strip():
+            self.nip.errors.append('NIP wajib diisi untuk akun guru.')
+            return False
+
+        return True
 
     def validate_email(self, email):
-        if User.query.filter_by(email=email.data).first():
+        if User.query.filter_by(email=(email.data or '').strip().lower()).first():
             raise ValidationError('Email sudah terdaftar.')
+
+    def validate_nis(self, nis):
+        value = (nis.data or '').strip().upper()
+        if value and User.query.filter_by(nis=value).first():
+            raise ValidationError('NIS sudah digunakan.')
+
+    def validate_nip(self, nip):
+        value = (nip.data or '').strip().upper()
+        if value and User.query.filter_by(nip=value).first():
+            raise ValidationError('NIP sudah digunakan.')
 
 
 class TugasForm(FlaskForm):
@@ -50,8 +82,9 @@ class SubmissionForm(FlaskForm):
     konten = TextAreaField('Deskripsi / Jawaban Teks',
                            validators=[Optional(), Length(max=5000)])
     file = FileField('Upload Dokumen',
+                     render_kw={'accept': UPLOAD_ACCEPT},
                      validators=[Optional(),
-                                 FileAllowed(ALLOWED_UPLOAD, 'Format tidak didukung. Gunakan: PDF, DOC, DOCX, ZIP, gambar, dll.')])
+                                 FileAllowed(ALLOWED_UPLOAD, 'Format tidak didukung. Gunakan: PDF, file Microsoft Office, ZIP, atau gambar.')])
     link_url = StringField('Link / URL',
                            validators=[Optional(), URL(require_tld=False), Length(max=500)])
     submit = SubmitField('Kumpulkan Tugas')

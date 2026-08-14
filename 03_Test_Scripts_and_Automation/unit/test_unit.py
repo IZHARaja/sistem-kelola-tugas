@@ -8,7 +8,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from app.models import User, Tugas, Submission
 from app.security import sanitize_input, validate_password_strength
-from datetime import datetime, timedelta
+from datetime import timedelta
+from app.time_utils import utc_now
 
 
 # ─── USER MODEL ────────────────────────────────────────────────────────────────
@@ -16,32 +17,32 @@ from datetime import datetime, timedelta
 class TestUserModel:
     def test_password_hashing_produces_hash(self, db):
         """set_password harus menyimpan hash, bukan plaintext."""
-        u = User(username='u1', email='u1@test.com', role='mahasiswa')
+        u = User(username='u1', full_name='User Satu', nis='NISU1', email='u1@test.com', role='mahasiswa')
         u.set_password('Rahasia@99')
         assert u.password_hash is not None
         assert u.password_hash != 'Rahasia@99'
 
     def test_password_hash_uses_pbkdf2(self, db):
         """Hash harus menggunakan algoritma pbkdf2:sha256."""
-        u = User(username='u2', email='u2@test.com', role='mahasiswa')
+        u = User(username='u2', full_name='User Dua', nis='NISU2', email='u2@test.com', role='mahasiswa')
         u.set_password('Test@1234!')
         assert u.password_hash.startswith('pbkdf2:sha256')
 
     def test_check_password_correct(self, db):
         """check_password harus return True untuk password yang benar."""
-        u = User(username='u3', email='u3@test.com', role='mahasiswa')
+        u = User(username='u3', full_name='User Tiga', nis='NISU3', email='u3@test.com', role='mahasiswa')
         u.set_password('Correct@99!')
         assert u.check_password('Correct@99!') is True
 
     def test_check_password_wrong(self, db):
         """check_password harus return False untuk password yang salah."""
-        u = User(username='u4', email='u4@test.com', role='mahasiswa')
+        u = User(username='u4', full_name='User Empat', nis='NISU4', email='u4@test.com', role='mahasiswa')
         u.set_password('Correct@99!')
         assert u.check_password('WrongPass!1') is False
 
     def test_user_default_is_active(self, db):
         """User baru harus aktif secara default."""
-        u = User(username='u5', email='u5@test.com', role='mahasiswa')
+        u = User(username='u5', full_name='User Lima', nis='NISU5', email='u5@test.com', role='mahasiswa')
         u.set_password('Pass@1234!')
         db.session.add(u)
         db.session.commit()
@@ -49,15 +50,15 @@ class TestUserModel:
 
     def test_user_repr(self, db):
         """__repr__ harus mengembalikan string yang bermakna."""
-        u = User(username='repruser', email='repr@test.com', role='dosen')
-        assert 'repruser' in repr(u)
+        u = User(username='repruser', full_name='Repr User', nip='NIPR1', email='repr@test.com', role='dosen')
+        assert 'Repr User' in repr(u)
 
     def test_username_is_unique(self, db):
         """Username duplikat harus raise IntegrityError."""
         from sqlalchemy.exc import IntegrityError
-        u1 = User(username='dupuser', email='dup1@test.com', role='mahasiswa')
+        u1 = User(username='dupuser', full_name='Dup User Satu', nis='NISDUP1', email='dup1@test.com', role='mahasiswa')
         u1.set_password('Pass@1234!')
-        u2 = User(username='dupuser', email='dup2@test.com', role='mahasiswa')
+        u2 = User(username='dupuser', full_name='Dup User Dua', nis='NISDUP2', email='dup2@test.com', role='mahasiswa')
         u2.set_password('Pass@1234!')
         db.session.add(u1)
         db.session.commit()
@@ -69,9 +70,9 @@ class TestUserModel:
     def test_email_is_unique(self, db):
         """Email duplikat harus raise IntegrityError."""
         from sqlalchemy.exc import IntegrityError
-        u1 = User(username='emailtest1', email='same@test.com', role='mahasiswa')
+        u1 = User(username='emailtest1', full_name='Email Test Satu', nis='NISEMAIL1', email='same@test.com', role='mahasiswa')
         u1.set_password('Pass@1234!')
-        u2 = User(username='emailtest2', email='same@test.com', role='mahasiswa')
+        u2 = User(username='emailtest2', full_name='Email Test Dua', nis='NISEMAIL2', email='same@test.com', role='mahasiswa')
         u2.set_password('Pass@1234!')
         db.session.add(u1)
         db.session.commit()
@@ -86,7 +87,7 @@ class TestUserModel:
 class TestTugasModel:
     def test_create_tugas(self, db, dosen_user):
         """Tugas harus tersimpan dengan atribut yang benar."""
-        deadline = datetime.utcnow() + timedelta(days=3)
+        deadline = utc_now() + timedelta(days=3)
         t = Tugas(
             judul='Tugas Pemrograman',
             deskripsi='Buat program sorting.',
@@ -95,7 +96,7 @@ class TestTugasModel:
         )
         db.session.add(t)
         db.session.commit()
-        saved = Tugas.query.get(t.id)
+        saved = db.session.get(Tugas, t.id)
         assert saved.judul == 'Tugas Pemrograman'
         assert saved.dosen_id == dosen_user.id
 
@@ -108,10 +109,10 @@ class TestTugasModel:
         t = Tugas(
             judul='Cascade Test',
             deskripsi='Desc.',
-            deadline=datetime.utcnow() + timedelta(days=1),
+            deadline=utc_now() + timedelta(days=1),
             dosen_id=dosen_user.id,
         )
-        mhs = User(username='cascmhs', email='casc@test.com', role='mahasiswa')
+        mhs = User(username='cascmhs', full_name='Cascade Mhs', nis='NISCASC', email='casc@test.com', role='mahasiswa')
         mhs.set_password('Pass@1234!')
         db.session.add_all([t, mhs])
         db.session.commit()
@@ -137,7 +138,7 @@ class TestSubmissionModel:
         )
         db.session.add(sub)
         db.session.commit()
-        saved = Submission.query.get(sub.id)
+        saved = db.session.get(Submission, sub.id)
         assert saved.konten == 'Ini jawaban teks saya.'
         assert saved.file_path is None
         assert saved.link_url is None

@@ -4,9 +4,9 @@ Menyediakan sanitasi input, logging audit, dan validasi password.
 """
 import re
 import bleach
-from datetime import datetime
 from flask import request
 from . import db
+from .time_utils import utc_now
 
 _ALLOWED_TAGS: list = []      # Tidak ada tag HTML yang diizinkan
 _ALLOWED_ATTRIBUTES: dict = {}
@@ -30,7 +30,7 @@ def log_security_event(event_type: str, username: str = None, details: str = Non
             ip_address=(request.remote_addr or '')[:45],
             user_agent=(request.headers.get('User-Agent', '') or '')[:250],
             details=(details or '')[:500],
-            timestamp=datetime.utcnow(),
+            timestamp=utc_now(),
         )
         db.session.add(log)
         db.session.commit()

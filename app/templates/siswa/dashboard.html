@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Dashboard Mahasiswa{% endblock %}
+{% block title %}Dashboard Siswa{% endblock %}
 
 {% block content %}
 <div class="dashboard-container">
     <div class="page-header">
         <div>
-            <h1><i class="fas fa-graduation-cap"></i> Dashboard Mahasiswa</h1>
-            <p>Halo, <strong>{{ current_user.username }}</strong>!
+            <h1><i class="fas fa-graduation-cap"></i> Dashboard Siswa</h1>
+            <p>Halo, <strong>{{ current_user.display_name }}</strong>!
                Lihat dan kumpulkan tugas di bawah ini.</p>
         </div>
     </div>
@@ -72,7 +72,7 @@
                         {% endif %}
                     </span>
                     <span>
-                        <i class="fas fa-user-tie"></i> {{ tugas.dosen.username }}
+                        <i class="fas fa-user-tie"></i> {{ tugas.dosen.display_name }}
                     </span>
                 </div>
                 <div class="tugas-actions">
@@ -81,7 +81,7 @@
                         <i class="fas fa-check"></i> Terkumpul
                     </span>
                     {% elif not is_expired %}
-                    <a href="{{ url_for('mahasiswa.submit_tugas', tugas_id=tugas.id) }}"
+                          <a href="{{ url_for('siswa.submit_tugas', tugas_id=tugas.id) }}"
                        class="btn-primary btn-sm">
                         <i class="fas fa-upload"></i> Kumpulkan
                     </a>
@@ -97,7 +97,7 @@
         {% else %}
         <div class="empty-state">
             <i class="fas fa-inbox"></i>
-            <p>Belum ada tugas yang diberikan oleh dosen.</p>
+            <p>Belum ada tugas yang diberikan oleh guru.</p>
         </div>
         {% endif %}
     </div>

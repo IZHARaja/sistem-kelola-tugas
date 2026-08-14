@@ -1,15 +1,19 @@
 {
   "info": {
     "name": "SiKelTugas API Test Collection",
-    "description": "Koleksi pengujian API untuk aplikasi SiKelTugas - Sistem Kelola Tugas Mahasiswa.\nMencakup Auth, Dosen, Mahasiswa endpoints dengan validasi response.",
+    "description": "Koleksi pengujian API untuk aplikasi SiKelTugas - Sistem Kelola Tugas Sekolah.\nMencakup Auth, Guru, dan Siswa endpoints dengan validasi response.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {"key": "base_url", "value": "http://127.0.0.1:5000"},
-    {"key": "dosen_username", "value": "dosen_uas"},
-    {"key": "dosen_password", "value": "Dosen@1234!"},
-    {"key": "mhs_username", "value": "mhs_uas"},
-    {"key": "mhs_password", "value": "Mhs@1234!"},
+    {"key": "guru_nip", "value": "NIP-UAS-001"},
+    {"key": "guru_email", "value": "guru_uas@test.com"},
+    {"key": "guru_name", "value": "Guru UAS"},
+    {"key": "guru_password", "value": "Guru@1234!"},
+    {"key": "siswa_nis", "value": "NIS-UAS-001"},
+    {"key": "siswa_email", "value": "siswa_uas@test.com"},
+    {"key": "siswa_name", "value": "Siswa UAS"},
+    {"key": "siswa_password", "value": "Siswa@1234!"},
     {"key": "tugas_id", "value": "1"}
   ],
   "item": [
@@ -17,10 +21,10 @@
       "name": "01 — Auth",
       "item": [
         {
-          "name": "GET Login Page",
+          "name": "GET Portal Login Guru",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/login"
+            "url": "{{base_url}}/login/guru"
           },
           "event": [
             {
@@ -36,10 +40,10 @@
           ]
         },
         {
-          "name": "GET Register Page",
+          "name": "GET Register Siswa",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/register"
+            "url": "{{base_url}}/register/siswa"
           },
           "event": [
             {
@@ -54,18 +58,20 @@
           ]
         },
         {
-          "name": "POST Register - Dosen (Valid)",
+          "name": "POST Register - Guru (Valid)",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/register",
+            "url": "{{base_url}}/register/guru",
             "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
             "body": {
               "mode": "urlencoded",
               "urlencoded": [
-                {"key": "username", "value": "{{dosen_username}}"},
-                {"key": "email", "value": "dosen_uas@test.com"},
-                {"key": "password", "value": "{{dosen_password}}"},
-                {"key": "confirm_password", "value": "{{dosen_password}}"},
+                {"key": "full_name", "value": "{{guru_name}}"},
+                {"key": "email", "value": "{{guru_email}}"},
+                {"key": "nis", "value": ""},
+                {"key": "nip", "value": "{{guru_nip}}"},
+                {"key": "password", "value": "{{guru_password}}"},
+                {"key": "confirm_password", "value": "{{guru_password}}"},
                 {"key": "role", "value": "dosen"}
               ]
             }
@@ -84,18 +90,20 @@
           ]
         },
         {
-          "name": "POST Register - Mahasiswa (Valid)",
+          "name": "POST Register - Siswa (Valid)",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/register",
+            "url": "{{base_url}}/register/siswa",
             "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
             "body": {
               "mode": "urlencoded",
               "urlencoded": [
-                {"key": "username", "value": "{{mhs_username}}"},
-                {"key": "email", "value": "mhs_uas@test.com"},
-                {"key": "password", "value": "{{mhs_password}}"},
-                {"key": "confirm_password", "value": "{{mhs_password}}"},
+                {"key": "full_name", "value": "{{siswa_name}}"},
+                {"key": "email", "value": "{{siswa_email}}"},
+                {"key": "nis", "value": "{{siswa_nis}}"},
+                {"key": "nip", "value": ""},
+                {"key": "password", "value": "{{siswa_password}}"},
+                {"key": "confirm_password", "value": "{{siswa_password}}"},
                 {"key": "role", "value": "mahasiswa"}
               ]
             }
@@ -103,16 +111,19 @@
           "event": [{"listen": "test", "script": {"exec": ["pm.test('Status 200 or 302', () => pm.expect(pm.response.code).to.be.oneOf([200,302]));"]}}]
         },
         {
-          "name": "POST Login - Dosen (Valid)",
+          "name": "POST Login - Guru (Valid)",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/login",
+            "url": "{{base_url}}/login/guru",
             "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
             "body": {
               "mode": "urlencoded",
               "urlencoded": [
-                {"key": "username", "value": "{{dosen_username}}"},
-                {"key": "password", "value": "{{dosen_password}}"}
+                {"key": "role", "value": "dosen"},
+                {"key": "identifier", "value": "{{guru_nip}}"},
+                {"key": "email", "value": "{{guru_email}}"},
+                {"key": "full_name", "value": "{{guru_name}}"},
+                {"key": "password", "value": "{{guru_password}}"}
               ]
             }
           },
@@ -121,7 +132,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Login dosen — redirect ke dashboard', () => {",
+                  "pm.test('Login guru — redirect ke dashboard', () => {",
                   "  pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
                   "});",
                   "pm.test('Response time < 800ms', () => pm.expect(pm.response.responseTime).to.be.below(800));"
@@ -134,12 +145,15 @@
           "name": "POST Login - Wrong Password (Invalid)",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/login",
+            "url": "{{base_url}}/login/guru",
             "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
             "body": {
               "mode": "urlencoded",
               "urlencoded": [
-                {"key": "username", "value": "{{dosen_username}}"},
+                {"key": "role", "value": "dosen"},
+                {"key": "identifier", "value": "{{guru_nip}}"},
+                {"key": "email", "value": "{{guru_email}}"},
+                {"key": "full_name", "value": "{{guru_name}}"},
                 {"key": "password", "value": "WrongPass999"}
               ]
             }
@@ -151,7 +165,7 @@
                 "exec": [
                   "pm.test('Login gagal — tetap di halaman login', () => pm.response.to.have.status(200));",
                   "pm.test('Tidak ada redirect ke dashboard', () => {",
-                  "  pm.expect(pm.response.text()).to.not.include('/dosen/dashboard');",
+                  "  pm.expect(pm.response.text()).to.not.include('/guru/dashboard');",
                   "});"
                 ]
               }
@@ -178,32 +192,35 @@
       ]
     },
     {
-      "name": "02 — Dosen Endpoints",
+      "name": "02 — Guru Endpoints",
       "item": [
         {
-          "name": "POST Login Dosen (Session Setup)",
+          "name": "POST Login Guru (Session Setup)",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/login",
+            "url": "{{base_url}}/login/guru",
             "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
             "body": {
               "mode": "urlencoded",
               "urlencoded": [
-                {"key": "username", "value": "{{dosen_username}}"},
-                {"key": "password", "value": "{{dosen_password}}"}
+                {"key": "role", "value": "dosen"},
+                {"key": "identifier", "value": "{{guru_nip}}"},
+                {"key": "email", "value": "{{guru_email}}"},
+                {"key": "full_name", "value": "{{guru_name}}"},
+                {"key": "password", "value": "{{guru_password}}"}
               ]
             }
           }
         },
         {
-          "name": "GET Dosen Dashboard",
-          "request": {"method": "GET", "url": "{{base_url}}/dosen/dashboard"},
+          "name": "GET Guru Dashboard",
+          "request": {"method": "GET", "url": "{{base_url}}/guru/dashboard"},
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Dashboard dosen 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Dashboard guru 200', () => pm.response.to.have.status(200));",
                   "pm.test('Response time < 500ms', () => pm.expect(pm.response.responseTime).to.be.below(500));"
                 ]
               }
@@ -212,14 +229,14 @@
         },
         {
           "name": "GET Buat Tugas Form",
-          "request": {"method": "GET", "url": "{{base_url}}/dosen/tugas/buat"},
+          "request": {"method": "GET", "url": "{{base_url}}/guru/tugas/buat"},
           "event": [{"listen": "test", "script": {"exec": ["pm.test('Form buat tugas 200', () => pm.response.to.have.status(200));"]}}]
         },
         {
           "name": "POST Buat Tugas (Valid)",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/dosen/tugas/buat",
+            "url": "{{base_url}}/guru/tugas/buat",
             "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
             "body": {
               "mode": "urlencoded",
@@ -243,7 +260,7 @@
         },
         {
           "name": "GET Submissions Tugas",
-          "request": {"method": "GET", "url": "{{base_url}}/dosen/tugas/{{tugas_id}}/submissions"},
+          "request": {"method": "GET", "url": "{{base_url}}/guru/tugas/{{tugas_id}}/submissions"},
           "event": [
             {
               "listen": "test",
@@ -258,32 +275,35 @@
       ]
     },
     {
-      "name": "03 — Mahasiswa Endpoints",
+      "name": "03 — Siswa Endpoints",
       "item": [
         {
-          "name": "POST Login Mahasiswa (Session Setup)",
+          "name": "POST Login Siswa (Session Setup)",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/login",
+            "url": "{{base_url}}/login/siswa",
             "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
             "body": {
               "mode": "urlencoded",
               "urlencoded": [
-                {"key": "username", "value": "{{mhs_username}}"},
-                {"key": "password", "value": "{{mhs_password}}"}
+                {"key": "role", "value": "mahasiswa"},
+                {"key": "identifier", "value": "{{siswa_nis}}"},
+                {"key": "email", "value": "{{siswa_email}}"},
+                {"key": "full_name", "value": "{{siswa_name}}"},
+                {"key": "password", "value": "{{siswa_password}}"}
               ]
             }
           }
         },
         {
-          "name": "GET Mahasiswa Dashboard",
-          "request": {"method": "GET", "url": "{{base_url}}/mahasiswa/dashboard"},
+          "name": "GET Siswa Dashboard",
+          "request": {"method": "GET", "url": "{{base_url}}/siswa/dashboard"},
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Dashboard mahasiswa 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Dashboard siswa 200', () => pm.response.to.have.status(200));",
                   "pm.test('Response time < 500ms', () => pm.expect(pm.response.responseTime).to.be.below(500));"
                 ]
               }
@@ -292,7 +312,7 @@
         },
         {
           "name": "GET Form Submit Tugas",
-          "request": {"method": "GET", "url": "{{base_url}}/mahasiswa/tugas/{{tugas_id}}/submit"},
+          "request": {"method": "GET", "url": "{{base_url}}/siswa/tugas/{{tugas_id}}/submit"},
           "event": [
             {
               "listen": "test",
@@ -308,7 +328,7 @@
           "name": "POST Submit Tugas - Teks (Valid)",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/mahasiswa/tugas/{{tugas_id}}/submit",
+            "url": "{{base_url}}/siswa/tugas/{{tugas_id}}/submit",
             "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
             "body": {
               "mode": "urlencoded",
@@ -332,7 +352,7 @@
           "name": "POST Submit Tugas - Kosong (Invalid)",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/mahasiswa/tugas/{{tugas_id}}/submit",
+            "url": "{{base_url}}/siswa/tugas/{{tugas_id}}/submit",
             "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
             "body": {
               "mode": "urlencoded",
@@ -359,8 +379,8 @@
       "name": "04 — Security Tests",
       "item": [
         {
-          "name": "Akses Dosen Endpoint tanpa Login",
-          "request": {"method": "GET", "url": "{{base_url}}/dosen/dashboard"},
+          "name": "Akses Guru Endpoint tanpa Login",
+          "request": {"method": "GET", "url": "{{base_url}}/guru/dashboard"},
           "event": [
             {
               "listen": "test",
@@ -373,16 +393,18 @@
           ]
         },
         {
-          "name": "XSS Payload pada Username",
+          "name": "XSS Payload pada Nama Lengkap",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/register",
+            "url": "{{base_url}}/register/siswa",
             "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
             "body": {
               "mode": "urlencoded",
               "urlencoded": [
-                {"key": "username", "value": "<script>alert(1)</script>"},
+                {"key": "full_name", "value": "<script>alert(1)</script>"},
                 {"key": "email", "value": "xss@test.com"},
+                {"key": "nis", "value": "NISXSS01"},
+                {"key": "nip", "value": ""},
                 {"key": "password", "value": "Xss@1234!"},
                 {"key": "confirm_password", "value": "Xss@1234!"},
                 {"key": "role", "value": "mahasiswa"}

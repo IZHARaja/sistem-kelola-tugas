@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Detail Submission — {{ tugas.judul }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <a href="{{ url_for('guru.view_submissions', tugas_id=tugas.id) }}" class="back-link">
+        <i class="fas fa-arrow-left"></i> Kembali ke Daftar Submission
+    </a>
+
+    <div class="page-header">
+        <div>
+            <h1><i class="fas fa-file-alt"></i> Detail Pengumpulan Siswa</h1>
+            <p>
+                Tugas: <strong>{{ tugas.judul }}</strong>
+                &mdash; Dikumpulkan oleh <strong>{{ submission.mahasiswa.display_name }}</strong>
+            </p>
+        </div>
+    </div>
+
+    <div class="stats-grid" style="margin-bottom: 2rem;">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+            <div class="stat-info">
+                <span class="stat-number" style="font-size: 1rem;">{{ submission.mahasiswa.nis or '—' }}</span>
+                <span class="stat-label">NIS Siswa</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: var(--secondary);"><i class="fas fa-clock"></i></div>
+            <div class="stat-info">
+                <span class="stat-number" style="font-size: 1rem;">{{ submission.submitted_at.strftime('%d %b %Y, %H:%M') }}</span>
+                <span class="stat-label">Waktu Pengumpulan</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: {% if submission.submitted_at <= tugas.deadline %}var(--success){% else %}var(--danger){% endif %};">
+                <i class="fas {% if submission.submitted_at <= tugas.deadline %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-number" style="font-size: 1rem;">{% if submission.submitted_at <= tugas.deadline %}Tepat Waktu{% else %}Terlambat{% endif %}</span>
+                <span class="stat-label">Status Pengumpulan</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-section">
+        <h2><i class="fas fa-id-card"></i> Identitas Siswa</h2>
+        <div class="tugas-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+            <div class="tugas-card">
+                <strong>Nama Lengkap</strong>
+                <p class="tugas-desc">{{ submission.mahasiswa.display_name }}</p>
+            </div>
+            <div class="tugas-card">
+                <strong>Email</strong>
+                <p class="tugas-desc">{{ submission.mahasiswa.email }}</p>
+            </div>
+            <div class="tugas-card">
+                <strong>NIS</strong>
+                <p class="tugas-desc">{{ submission.mahasiswa.nis or '—' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-section">
+        <h2><i class="fas fa-align-left"></i> Jawaban Teks</h2>
+        {% if submission.konten %}
+        <div class="tugas-card" style="white-space: pre-wrap; line-height: 1.7;">{{ submission.konten }}</div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-file-alt"></i>
+            <p>Siswa ini tidak mengirim jawaban dalam bentuk teks.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card-section">
+        <h2><i class="fas fa-paperclip"></i> Lampiran Pengumpulan</h2>
+        <div class="tugas-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+            <div class="tugas-card">
+                <strong>File</strong>
+                {% if submission.file_path %}
+                <p class="tugas-desc">{{ submission.file_original }}</p>
+                <a href="{{ url_for('auth.download_file', filename=submission.file_path) }}" class="btn-secondary btn-sm">
+                    <i class="fas fa-download"></i> Unduh File
+                </a>
+                {% else %}
+                <p class="tugas-desc">Tidak ada file yang diunggah.</p>
+                {% endif %}
+            </div>
+            <div class="tugas-card">
+                <strong>Link</strong>
+                {% if submission.link_url %}
+                <p class="tugas-desc" style="word-break: break-word;">{{ submission.link_url }}</p>
+                <a href="{{ submission.link_url }}" target="_blank" rel="noopener noreferrer" class="btn-primary btn-sm">
+                    <i class="fas fa-external-link-alt"></i> Buka Link
+                </a>
+                {% else %}
+                <p class="tugas-desc">Tidak ada link yang disertakan.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

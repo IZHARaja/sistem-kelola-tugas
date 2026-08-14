@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Dashboard Dosen{% endblock %}
+{% block title %}Dashboard Guru{% endblock %}
 
 {% block content %}
 <div class="dashboard-container">
     <div class="page-header">
         <div>
-            <h1><i class="fas fa-chalkboard-teacher"></i> Dashboard Dosen</h1>
-            <p>Halo, <strong>{{ current_user.username }}</strong>!
-               Kelola penugasan dan pantau submissions mahasiswa.</p>
+                <h1><i class="fas fa-chalkboard-teacher"></i> Dashboard Guru</h1>
+            <p>Halo, <strong>{{ current_user.display_name }}</strong>!
+                    Kelola penugasan dan pantau pengumpulan tugas siswa.</p>
         </div>
-        <a href="{{ url_for('dosen.create_tugas') }}" class="btn-primary">
+        <a href="{{ url_for('guru.create_tugas') }}" class="btn-primary">
             <i class="fas fa-plus"></i> Buat Tugas Baru
         </a>
     </div>
@@ -71,16 +71,16 @@
                     </span>
                 </div>
                 <div class="tugas-actions">
-                    <a href="{{ url_for('dosen.view_submissions', tugas_id=tugas.id) }}"
+                          <a href="{{ url_for('guru.view_submissions', tugas_id=tugas.id) }}"
                        class="btn-secondary btn-sm">
                         <i class="fas fa-eye"></i> Submissions
                     </a>
-                    <a href="{{ url_for('dosen.edit_tugas', tugas_id=tugas.id) }}"
+                          <a href="{{ url_for('guru.edit_tugas', tugas_id=tugas.id) }}"
                        class="btn-warning btn-sm">
                         <i class="fas fa-edit"></i> Edit
                     </a>
                     <form method="POST"
-                          action="{{ url_for('dosen.delete_tugas', tugas_id=tugas.id) }}"
+                          action="{{ url_for('guru.delete_tugas', tugas_id=tugas.id) }}"
                           style="display:inline"
                           onsubmit="return confirmDelete('{{ tugas.judul | e }}')">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -96,7 +96,7 @@
         <div class="empty-state">
             <i class="fas fa-inbox"></i>
             <p>Belum ada tugas yang dibuat.</p>
-            <a href="{{ url_for('dosen.create_tugas') }}" class="btn-primary"
+                <a href="{{ url_for('guru.create_tugas') }}" class="btn-primary"
                style="margin-top: 1.25rem; display: inline-flex;">
                 <i class="fas fa-plus"></i> Buat Tugas Pertama
             </a>
